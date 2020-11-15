@@ -1,18 +1,17 @@
-import mongodb from 'mongodb';
-
-const mongoClient = mongodb.MongoClient;
+const mongodb = require('mongodb'),
+ mongoClient = mongodb.MongoClient;
 
 let dbName = "kuda_db";
 
 const uri = "mongodb+srv://testuser:test123@cluster0.zbwx9.mongodb.net/kuda_db?retryWrites=true&w=majority";
 
-export const getCollectionDocuments = async (collectionName) => {
+const getCollectionDocuments = async (collectionName) => {
     const mongo = await mongoClient.connect(uri, { useUnifiedTopology: true })
     const dataCollection = await mongo.db(dbName).collection(collectionName).find({}).toArray();
     mongo.close();
     return dataCollection;
 }
-export const createCollectionDocument = async (collectionName, data) => {
+const createCollectionDocument = async (collectionName, data) => {
     const mongo = await mongoClient.connect(uri, { useUnifiedTopology: true })
     if (!data._id) {
         data._id = new mongodb.ObjectID().toString();
@@ -22,7 +21,7 @@ export const createCollectionDocument = async (collectionName, data) => {
     }
     mongo.close();
 }
-export const updateCollectionDocument = async (collectionName, data) => {
+const updateCollectionDocument = async (collectionName, data) => {
     const mongo = await mongoClient.connect(uri, { useUnifiedTopology: true })
     var myquery = { _id: new mongodb.ObjectID(data._id) };
     var newvalues = { $set: data };
@@ -33,10 +32,17 @@ export const updateCollectionDocument = async (collectionName, data) => {
      );
     mongo.close();
 }
-export const deleteCollectionDocument = async (collectionName, data) => {
+const deleteCollectionDocument = async (collectionName, data) => {
     const mongo = await mongoClient.connect(uri, { useUnifiedTopology: true })
     await mongo.db(dbName).collection(collectionName).deleteOne(
         { _id : data._id }
      );
     mongo.close();
+}
+
+module.exports = {
+    getCollectionDocuments,
+    createCollectionDocument,
+    updateCollectionDocument,
+    deleteCollectionDocument
 }
